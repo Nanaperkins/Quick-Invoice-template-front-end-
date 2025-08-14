@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quick Invoice PRO — WOW</title>
+  <meta name="description" content="Create invoices fast. Animations, live currency converter, logo, dark mode, export JSON, print PDF. No server needed.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='24' fill='%232563eb'/%3E%3Ctext x='50%' y='56%' text-anchor='middle' font-size='62' fill='white' font-family='Arial'%3EQI%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="left">
+      <h1>Quick Invoice PRO</h1>
+    </div>
+    <nav class="top-nav">
+      <button id="newBtn" class="btn">New</button>
+      <button id="saveBtn" class="btn">Save</button>
+      <button id="loadBtn" class="btn">Load</button>
+      <button id="exportBtn" class="btn">Export JSON</button>
+      <label class="btn file-label">Import JSON<input type="file" id="importInput" accept="application/json" hidden></label>
+      <button id="printBtn" class="btn btn-primary">Print or PDF</button>
+      <button id="themeBtn" class="btn" title="Toggle theme">Theme</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2>Brand</h2>
+      <div class="grid-3">
+        <label>Logo
+          <input id="logoInput" type="file" accept="image/*" />
+        </label>
+        <label>Business name
+          <input id="bizName" placeholder="Perkins Ventures" />
+        </label>
+        <label>Email
+          <input id="bizEmail" type="email" placeholder="hello@business.com" />
+        </label>
+        <label>Phone
+          <input id="bizPhone" placeholder="+233..." />
+        </label>
+        <label>Address
+          <input id="bizAddress" placeholder="Street, City" />
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Client</h2>
+      <div class="grid-2">
+        <label>Client name
+          <input id="clientName" placeholder="Client Ltd." />
+        </label>
+        <label>Email
+          <input id="clientEmail" type="email" placeholder="client@email.com" />
+        </label>
+        <label>Phone
+          <input id="clientPhone" placeholder="+233..." />
+        </label>
+        <label>Address
+          <input id="clientAddress" placeholder="Street, City" />
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Invoice</h2>
+      <div class="grid-4">
+        <label>Invoice #
+          <input id="invoiceNumber" placeholder="INV-0001" />
+        </label>
+        <label>Date
+          <input id="invoiceDate" type="date" />
+        </label>
+        <label>Due
+          <input id="dueDate" type="date" />
+        </label>
+        <label>Currency
+          <select id="currency">
+            <option value="GHS" selected>GHS</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="NGN">NGN</option>
+            <option value="KES">KES</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="items-header">
+        <h2>Items</h2>
+        <div class="row-actions">
+          <button id="addItemBtn" class="btn">Add item</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="itemsTable">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Tax %</th>
+              <th>Line Total</th>
+              <th>Move</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel grid-2 collapse-on-print">
+      <div>
+        <h2>Extras</h2>
+        <div class="grid-2">
+          <label>Discount
+            <input id="discount" type="number" min="0" step="0.01" placeholder="0.00" />
+          </label>
+          <label>Shipping
+            <input id="shipping" type="number" min="0" step="0.01" placeholder="0.00" />
+          </label>
+        </div>
+        <label>Notes
+          <textarea id="notes" rows="4" placeholder="Thanks for your business"></textarea>
+        </label>
+        <label>Terms
+          <textarea id="terms" rows="3" placeholder="Payment due within 7 days"></textarea>
+        </label>
+      </div>
+
+      <aside class="totals-card">
+        <h2>Totals</h2>
+        <div class="totals-row"><span>Subtotal</span><span id="subtotal" class="pulseable">0.00</span></div>
+        <div class="totals-row"><span>Tax</span><span id="taxTotal" class="pulseable">0.00</span></div>
+        <div class="totals-row"><span>Discount</span><span id="discountOut" class="pulseable">0.00</span></div>
+        <div class="totals-row"><span>Shipping</span><span id="shippingOut" class="pulseable">0.00</span></div>
+        <div class="totals-row grand"><span>Total</span><span id="grandTotal" class="pulseable">0.00</span></div>
+
+        <div class="convert-box">
+          <div class="convert-row">
+            <label for="displayCurrency"><strong>Convert total to</strong></label>
+            <select id="displayCurrency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+              <option value="NGN">NGN</option>
+              <option value="KES">KES</option>
+              <option value="GHS" selected>GHS</option>
+            </select>
+          </div>
+          <div class="convert-row small muted" id="rateInfo">Fetching rates...</div>
+          <div class="convert-row grand">
+            <span id="convertedLabel">Converted Total</span>
+            <span id="convertedTotal">0.00</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <h2 class="print-only center">Invoice Preview</h2>
+      <div id="preview" class="invoice-preview"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Static only. Live rates fetched client-side when available.</small>
+  </footer>
+
+  <template id="itemRowTemplate">
+    <tr class="row-enter">
+      <td><input class="desc" placeholder="Service or item" /></td>
+      <td class="numcell"><input class="qty" type="number" min="0" step="1" value="1" /></td>
+      <td class="numcell"><input class="price" type="number" min="0" step="0.01" value="0.00" /></td>
+      <td class="numcell"><input class="tax" type="number" min="0" step="0.01" value="0" /></td>
+      <td class="line-total numcell">0.00</td>
+      <td class="controls">
+        <button class="icon-btn up" title="Move up">▲</button>
+        <button class="icon-btn down" title="Move down">▼</button>
+        <button class="icon-btn dup" title="Duplicate">⧉</button>
+      </td>
+      <td class="controls"><button class="icon-btn remove" title="Remove">×</button></td>
+    </tr>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
